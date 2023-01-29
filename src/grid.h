@@ -1,13 +1,14 @@
 #include <raylib.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <time.h>
 
 typedef struct {
     int x;
     int y;
 } Vector2i;
 
-#define tile_MAX UINTMAX_MAX
+#define TILE_MAX UINTMAX_MAX
 
 typedef struct {
     uintmax_t value;
@@ -20,6 +21,8 @@ typedef struct {
     Vector2i tileSize;
     int spacing;
     Tile** tiles;
+    int* freeTiles;
+    int nFreeTiles;
 } Grid;
 
 typedef enum {
@@ -53,6 +56,13 @@ inline Vector2i GridStridePixels(Grid grid, Vector2i pos) {
     return (Vector2i) {
         pos.x * (grid.tileSize.x + grid.spacing),
         pos.y * (grid.tileSize.y + grid.spacing),
+    };
+}
+
+inline Vector2i GridIndexToPos(Grid grid, int index) {
+    return (Vector2i) {
+        index % grid.size.x,
+        index / grid.size.x,
     };
 }
 
