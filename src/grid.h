@@ -56,5 +56,23 @@ inline Vector2i GridStridePixels(Grid grid, Vector2i pos) {
     };
 }
 
-Grid GridCreate(Vector2i size, Vector2i tileSize, int spacing);
+// create a new grid
+// `dims`: the number of tiles in each dimension
+// `tileSize`: the size of each tile in pixels
+// `spacing`: the spacing between tiles in pixels
+Grid GridCreate(Vector2i dims, Vector2i tileSize, int spacing);
+
+// free all memory allocated for the grid
 void GridDestroy(Grid* grid);
+
+// reset the grid, i.e. remove all tiles
+void GridReset(Grid* grid);
+
+// move all tiles in a direction, merging tiles with the same value
+void GridMove(Grid* grid, GridDirection direction);
+
+// make a tile appear in a random position, containing either 2 or 4
+void GridAddRandomTile(Grid* grid);
+
+// check if the grid is full, i.e. no more tiles can be added
+bool GridIsFull(Grid grid);

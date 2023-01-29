@@ -18,7 +18,7 @@ Grid GridCreate(Vector2i size, Vector2i tileSize, int spacing) {
         for (int y = 0; y < grid.size.y; y++) {
 
             grid.tiles[x][y].value = 0;
-            grid.tiles[x][y].visible = true;
+            grid.tiles[x][y].visible = false;
 
             Vector2i stride = GridStridePixels(grid, (Vector2i) {x, y});
             grid.tiles[x][y].screenPos.x = gridOrigin.x + stride.x;
@@ -38,4 +38,14 @@ void GridDestroy(Grid* grid) {
 
     free(grid->tiles);
     grid->tiles = NULL;
+}
+
+void GridReset(Grid* grid) {
+
+    for (int x = 0; x < grid->size.x; x++) {
+        for (int y = 0; y < grid->size.y; y++) {
+            grid->tiles[x][y].value = 0;
+            grid->tiles[x][y].visible = false;
+        }
+    }
 }

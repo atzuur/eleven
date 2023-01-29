@@ -10,8 +10,8 @@ int main(void) {
     SetTargetFPS(60);
 
     Vector2i gridSize = {4, 4};
-    Vector2i tileSize = {100, 100}; // pixels
-    int spacing = 10; // pixels
+    Vector2i tileSize = {100, 100};
+    int spacing = 10;
 
     Grid grid = GridCreate(gridSize, tileSize, spacing);
 
@@ -24,7 +24,7 @@ int main(void) {
         for (int x = 0; x < grid.size.x; x++) {
             for (int y = 0; y < grid.size.y; y++) {
 
-                tile* tile = &grid.tiles[x][y];
+                Tile* tile = &grid.tiles[x][y];
 
                 if (tile->visible) {
                     DrawRectangle(tile->screenPos.x, tile->screenPos.y,
