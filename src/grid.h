@@ -13,13 +13,13 @@ typedef struct {
     uintmax_t value;
     bool visible;
     Vector2i screenPos;
-} tile;
+} Tile;
 
 typedef struct {
     Vector2i size;
     Vector2i tileSize;
     int spacing;
-    tile** tiles;
+    Tile** tiles;
 } Grid;
 
 typedef enum {
@@ -58,4 +58,3 @@ inline Vector2i GridStridePixels(Grid grid, Vector2i pos) {
 
 Grid GridCreate(Vector2i size, Vector2i tileSize, int spacing);
 void GridDestroy(Grid* grid);
-void GridMove(Grid* grid, GridDirection direction);

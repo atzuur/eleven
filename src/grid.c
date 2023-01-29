@@ -7,9 +7,9 @@ Grid GridCreate(Vector2i size, Vector2i tileSize, int spacing) {
     grid.tileSize = tileSize;
     grid.spacing = spacing;
 
-    grid.tiles = malloc(sizeof(tile*) * grid.size.x);
+    grid.tiles = malloc(sizeof(Tile*) * grid.size.x);
     for (int x = 0; x < grid.size.x; x++) {
-        grid.tiles[x] = malloc(sizeof(tile) * grid.size.y);
+        grid.tiles[x] = malloc(sizeof(Tile) * grid.size.y);
     }
 
     Vector2i gridOrigin = GridOrigin(grid);
