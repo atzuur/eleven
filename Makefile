@@ -1,12 +1,19 @@
 CC := gcc
-CFLAGS := -Wall -Wextra -pedantic -std=c99 -O3 -Iraylib/src
+CFLAGS_COMMON := -Wall -Wextra -pedantic -std=c99 -Iraylib/src
+CFLAGS_DEBUG := -g3 -Og -D DEBUG
+CFLAGS_RELEASE := -O3
 LDLIBS := -lopengl32 -lgdi32 -lwinmm -lkernel32
 
 RAYLIB_BIN := raylib/src/libraylib.a
 FILES := $(wildcard src/*.c) $(RAYLIB_BIN) $(LDLIBS)
 
-all: $(RAYLIB_BIN)
-	$(CC) $(CFLAGS) $(FILES) -o eleven
+.PHONY: release clean
+
+release: $(RAYLIB_BIN)
+	$(CC) $(CFLAGS_COMMON) $(CFLAGS_RELEASE) $(FILES) -o eleven
+
+debug: $(RAYLIB_BIN)
+	$(CC) $(CFLAGS_COMMON) $(CFLAGS_DEBUG) $(FILES) -o eleven
 
 $(RAYLIB_BIN):
 ifeq (,$(wildcard $(RAYLIB_BIN))) # if raylib is not built yet
