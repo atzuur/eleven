@@ -10,10 +10,10 @@ int main(void) {
     SetTargetFPS(60);
 
     Vector2i gridSize = {4, 4};
-    Vector2i squareSize = {100, 100}; // pixels
+    Vector2i tileSize = {100, 100}; // pixels
     int spacing = 10; // pixels
 
-    Grid grid = GridCreate(gridSize, squareSize, spacing);
+    Grid grid = GridCreate(gridSize, tileSize, spacing);
 
     while (!WindowShouldClose()) {
 
@@ -24,11 +24,11 @@ int main(void) {
         for (int x = 0; x < grid.size.x; x++) {
             for (int y = 0; y < grid.size.y; y++) {
 
-                Square* square = &grid.squares[x][y];
+                tile* tile = &grid.tiles[x][y];
 
-                if (square->visible) {
-                    DrawRectangle(square->screenPos.x, square->screenPos.y,
-                                  grid.squareSize.x, grid.squareSize.y, RED);
+                if (tile->visible) {
+                    DrawRectangle(tile->screenPos.x, tile->screenPos.y,
+                                  grid.tileSize.x, grid.tileSize.y, RED);
                 }
             }
         }

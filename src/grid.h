@@ -7,19 +7,19 @@ typedef struct {
     int y;
 } Vector2i;
 
-#define SQUARE_MAX UINTMAX_MAX
+#define tile_MAX UINTMAX_MAX
 
 typedef struct {
     uintmax_t value;
     bool visible;
     Vector2i screenPos;
-} Square;
+} tile;
 
 typedef struct {
     Vector2i size;
-    Vector2i squareSize;
+    Vector2i tileSize;
     int spacing;
-    Square** squares;
+    tile** tiles;
 } Grid;
 
 typedef enum {
@@ -35,8 +35,8 @@ inline int GridSize(Grid grid) {
 
 inline Vector2i GridSizePixels(Grid grid) {
     return (Vector2i) {
-        grid.size.x * grid.squareSize.x + (grid.size.x - 1) * grid.spacing,
-        grid.size.y * grid.squareSize.y + (grid.size.y - 1) * grid.spacing,
+        grid.size.x * grid.tileSize.x + (grid.size.x - 1) * grid.spacing,
+        grid.size.y * grid.tileSize.y + (grid.size.y - 1) * grid.spacing,
     };
 }
 
@@ -51,10 +51,11 @@ inline Vector2i GridOrigin(Grid grid) {
 
 inline Vector2i GridStridePixels(Grid grid, Vector2i pos) {
     return (Vector2i) {
-        pos.x * (grid.squareSize.x + grid.spacing),
-        pos.y * (grid.squareSize.y + grid.spacing),
+        pos.x * (grid.tileSize.x + grid.spacing),
+        pos.y * (grid.tileSize.y + grid.spacing),
     };
 }
 
-Grid GridCreate(Vector2i size, Vector2i squareSize, int spacing);
+Grid GridCreate(Vector2i size, Vector2i tileSize, int spacing);
 void GridDestroy(Grid* grid);
+void GridMove(Grid* grid, GridDirection direction);
