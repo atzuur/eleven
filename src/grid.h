@@ -8,12 +8,17 @@ typedef struct {
     int y;
 } Vector2i;
 
+#define STR(...) #__VA_ARGS__
+#define XSTR(...) STR(__VA_ARGS__)
+
 #define TILE_MAX UINTMAX_MAX
+#define TILE_MAX_DIGITS (sizeof XSTR(UINTMAX_MAX))
 
 typedef struct {
     uintmax_t value;
     bool visible;
     Vector2i screenPos;
+    char text[TILE_MAX_DIGITS];
 } Tile;
 
 typedef struct {
@@ -21,7 +26,7 @@ typedef struct {
     Vector2i tileSize;
     int spacing;
     Tile** tiles;
-    int* freeTiles;
+    int* freeTiles; // array of indices of free tiles
     int nFreeTiles;
 } Grid;
 
@@ -32,39 +37,26 @@ typedef enum {
     GRID_RIGHT,
 } GridDirection;
 
-inline int GridSize(Grid grid) {
-    return grid.size.x * grid.size.y;
-}
+// get the number of tiles in the grid
+int GridSize(Grid grid);
 
-inline Vector2i GridSizePixels(Grid grid) {
-    return (Vector2i) {
-        grid.size.x * grid.tileSize.x + (grid.size.x - 1) * grid.spacing,
-        grid.size.y * grid.tileSize.y + (grid.size.y - 1) * grid.spacing,
-    };
-}
+// get the size of the grid in pixels
+Vector2i GridSizePixels(Grid grid);
 
-inline Vector2i GridOrigin(Grid grid) {
-    Vector2i screenCenter = {GetScreenWidth() / 2, GetScreenHeight() / 2};
-    Vector2i gridPixels = GridSizePixels(grid);
-    return (Vector2i) {
-        screenCenter.x - gridPixels.x / 2,
-        screenCenter.y - gridPixels.y / 2,
-    };
-}
+// get the origin of the grid in pixels
+Vector2i GridOrigin(Grid grid);
 
-inline Vector2i GridStridePixels(Grid grid, Vector2i pos) {
-    return (Vector2i) {
-        pos.x * (grid.tileSize.x + grid.spacing),
-        pos.y * (grid.tileSize.y + grid.spacing),
-    };
-}
+// get the screen position of the tile at the given grid position (relative to origin)
+Vector2i GridStridePixels(Grid grid, Vector2i pos);
 
-inline Vector2i GridIndexToPos(Grid grid, int index) {
-    return (Vector2i) {
-        index % grid.size.x,
-        index / grid.size.x,
-    };
-}
+// convert a grid index to a grid position
+Vector2i GridIndexToPos(Grid grid, int index);
+
+// convert a grid position to a grid index
+int GridPosToIndex(Grid grid, Vector2i pos);
+
+// get the position of the tile adjacent to the tile at `pos` in the given `direction`
+Vector2i GridTileAdjacentTo(Grid grid, Vector2i pos, GridDirection direction);
 
 // create a new grid
 // `dims`: the number of tiles in each dimension
@@ -81,8 +73,14 @@ void GridReset(Grid* grid);
 // move all tiles in a direction, merging tiles with the same value
 void GridMove(Grid* grid, GridDirection direction);
 
+// move tile `pos` one step towards `direction`
+void GridStepTile(Grid* grid, Vector2i pos, GridDirection direction);
+
 // make a tile appear in a random position, containing either 2 or 4
 void GridAddRandomTile(Grid* grid);
 
 // check if the grid is full, i.e. no more tiles can be added
 bool GridIsFull(Grid grid);
+
+// update Grid::freeTiles to contain the indices of all free tiles
+void GridUpdateFreeTiles(Grid* grid);
