@@ -49,6 +49,9 @@ Vector2i GridOrigin(Grid grid);
 // get the screen position of the tile at the given grid position (relative to origin)
 Vector2i GridStridePixels(Grid grid, Vector2i pos);
 
+// convert a grid position to a screen position
+Vector2i GridPosToPixels(Grid grid, Vector2i pos);
+
 // convert a grid index to a grid position
 Vector2i GridIndexToPos(Grid grid, int index);
 

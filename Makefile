@@ -1,6 +1,6 @@
 CC := gcc
 CFLAGS_COMMON := -Wall -Wextra -pedantic -std=c99 -Iraylib/src
-CFLAGS_DEBUG := -g3 -O0 -D DEBUG
+CFLAGS_DEBUG := -g3 -Og -D DEBUG
 CFLAGS_RELEASE := -O3
 LDLIBS := -lopengl32 -lgdi32 -lwinmm -lkernel32
 

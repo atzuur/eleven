@@ -181,6 +181,15 @@ Vector2i GridStridePixels(Grid grid, Vector2i pos) {
     };
 }
 
+Vector2i GridPosToPixels(Grid grid, Vector2i pos) {
+    Vector2i origin = GridOrigin(grid);
+    Vector2i stride = GridStridePixels(grid, pos);
+    return (Vector2i) {
+        origin.x + stride.x,
+        origin.y + stride.y,
+    };
+}
+
 Vector2i GridIndexToPos(Grid grid, int index) {
     return (Vector2i) {
         index % grid.size.x,

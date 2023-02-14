@@ -1,13 +1,23 @@
 #include "grid.h"
+#include "raylib.h"
 #include <inttypes.h>
 #include <stdio.h>
+
+const char* const GridDirectionStrs[] = {
+    "up",
+    "down",
+    "left",
+    "right",
+};
 
 void EvDrawTile(Tile* tile, Vector2i tileSize) {
 
     DrawRectangle(tile->screenPos.x, tile->screenPos.y, tileSize.x, tileSize.y, BEIGE);
 
     snprintf(tile->text, TILE_MAX_DIGITS, "%" PRIuMAX, tile->value);
-    Vector2i textPos = {tile->screenPos.x / 2, tile->screenPos.y / 2};
+    Vector2i textPos = {tile->screenPos.x + tileSize.x / 2,
+                        tile->screenPos.y + tileSize.y / 2};
+
     DrawText(tile->text, textPos.x, textPos.y, 20, BLACK);
 }
 
@@ -78,8 +88,9 @@ int main(void) {
             case KEY_LEFT:
             case KEY_UP:
             case KEY_DOWN: {
-
-                GridMove(&grid, EvGetDirection(key));
+                GridDirection dir = EvGetDirection(key);
+                GridMove(&grid, dir);
+                printf("moved %s\n", GridDirectionStrs[dir]);
                 GridAddRandomTile(&grid);
             } break;
         }
@@ -88,13 +99,31 @@ int main(void) {
 
         ClearBackground(RAYWHITE);
 
+        Vector2i origin = GridOrigin(grid);
+        Vector2i size = GridSizePixels(grid);
+        Vector2i halfTile = {grid.tileSize.x / 2, grid.tileSize.y / 2};
+
+        // fill the background
+        DrawRectangle(origin.x, origin.y, size.x, size.y, BROWN);
+
         for (int x = 0; x < grid.size.x; x++) {
+
+            Vector2i xPos = GridPosToPixels(grid, (Vector2i) {x, 0});
+            DrawText(TextFormat("%d", x), xPos.x + halfTile.x, xPos.y - halfTile.y, 20,
+                     BLACK);
+
             for (int y = 0; y < grid.size.y; y++) {
 
                 Tile* tile = &grid.tiles[x][y];
 
                 if (tile->visible) {
                     EvDrawTile(tile, grid.tileSize);
+                }
+
+                if (x == 0) {
+                    Vector2i yPos = GridPosToPixels(grid, (Vector2i) {0, y});
+                    DrawText(TextFormat("%d", y), yPos.x - halfTile.x,
+                             yPos.y + halfTile.y, 20, BLACK);
                 }
             }
         }
