@@ -84,36 +84,35 @@ bool GridIsFull(Grid grid) {
 
 void GridMove(Grid* grid, GridDirection direction) {
 
-    Vector2i nextPos = {0};
-    Tile* nextTile = NULL;
-    Tile* currentTile = NULL;
-
     for (int x = 0; x < grid->size.x; x++) {
         for (int y = 0; y < grid->size.y; y++) {
 
-            currentTile = &grid->tiles[x][y];
-            if (!currentTile->visible)
+            Tile* curTile = &grid->tiles[x][y];
+            if (!curTile->visible)
                 continue;
 
+            Vector2i curPos = (Vector2i) {x, y};
+
             while (1) {
-                nextPos = GridTileAdjacentTo(*grid, (Vector2i) {x, y}, direction);
-                if (nextPos.x < 0 || nextPos.y < 0)
+                Vector2i nextPos = GridTileAdjacentTo(*grid, curPos, direction);
+                if (nextPos.x < 0 || nextPos.y < 0) // already on the edge
                     break;
 
-                nextTile = &grid->tiles[nextPos.x][nextPos.y];
+                Tile* nextTile = &grid->tiles[nextPos.x][nextPos.y];
 
-                // should merge
-                if (nextTile->visible && nextTile->value == currentTile->value) {
-                    GridStepTile(grid, (Vector2i) {x, y}, direction);
-                    nextTile->value += currentTile->value;
+                if (nextTile->visible && nextTile->value == curTile->value) {
 
-                } else if (nextTile->visible) { // blocked by another tile
-                    break;
-
-                } else { // empty tile, keep moving
-                    GridStepTile(grid, (Vector2i) {x, y}, direction);
+                    GridStepTile(grid, curPos, direction);
+                    curPos = nextPos;
+                    nextTile->value *= 2;
                     continue;
+
+                } else if (nextTile->visible) {
+                    break;
                 }
+
+                GridStepTile(grid, curPos, direction);
+                curPos = nextPos;
             }
         }
     }
@@ -125,13 +124,12 @@ void GridStepTile(Grid* grid, Vector2i pos, GridDirection direction) {
     if (destPos.x < 0 || destPos.y < 0)
         return;
 
-    Vector2i offsetTiles = {pos.x - destPos.x, pos.y - destPos.y};
     Tile* destTile = &grid->tiles[destPos.x][destPos.y];
-    *destTile = grid->tiles[pos.x][pos.y];
-
-    destTile->screenPos = GridStridePixels(*grid, offsetTiles);
-
     Tile* srcTile = &grid->tiles[pos.x][pos.y];
+    *destTile = *srcTile;
+
+    destTile->screenPos = GridPosToPixels(*grid, destPos);
+
     srcTile->visible = false;
     srcTile->value = 0;
 
@@ -227,6 +225,7 @@ Vector2i GridTileAdjacentTo(Grid grid, Vector2i pos, GridDirection direction) {
     // check bounds
     if (adjacent.x < 0 || adjacent.x >= grid.size.x)
         return (Vector2i) {-1, -1};
+
     if (adjacent.y < 0 || adjacent.y >= grid.size.y)
         return (Vector2i) {-1, -1};
 

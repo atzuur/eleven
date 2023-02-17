@@ -1,14 +1,6 @@
 #include "grid.h"
-#include "raylib.h"
 #include <inttypes.h>
 #include <stdio.h>
-
-const char* const GridDirectionStrs[] = {
-    "up",
-    "down",
-    "left",
-    "right",
-};
 
 void EvDrawTile(Tile* tile, Vector2i tileSize) {
 
@@ -88,9 +80,7 @@ int main(void) {
             case KEY_LEFT:
             case KEY_UP:
             case KEY_DOWN: {
-                GridDirection dir = EvGetDirection(key);
-                GridMove(&grid, dir);
-                printf("moved %s\n", GridDirectionStrs[dir]);
+                GridMove(&grid, EvGetDirection(key));
                 GridAddRandomTile(&grid);
             } break;
         }
