@@ -1,4 +1,6 @@
 #include "grid.h"
+#include <assert.h>
+#include <stdio.h>
 
 Grid GridCreate(Vector2i size, Vector2i tileSize, int spacing) {
 
@@ -28,12 +30,14 @@ Grid GridCreate(Vector2i size, Vector2i tileSize, int spacing) {
     for (int x = 0; x < grid.size.x; x++) {
         for (int y = 0; y < grid.size.y; y++) {
 
-            grid.tiles[x][y].value = 0;
-            grid.tiles[x][y].visible = false;
+            Tile* tile = &grid.tiles[x][y];
+
+            tile->value = 0;
+            tile->visible = false;
 
             Vector2i stride = GridStridePixels(grid, (Vector2i) {x, y});
-            grid.tiles[x][y].screenPos.x = gridOrigin.x + stride.x;
-            grid.tiles[x][y].screenPos.y = gridOrigin.y + stride.y;
+            tile->screenPos.x = gridOrigin.x + stride.x;
+            tile->screenPos.y = gridOrigin.y + stride.y;
         }
     }
 
@@ -55,8 +59,10 @@ void GridReset(Grid* grid) {
 
     for (int x = 0; x < grid->size.x; x++) {
         for (int y = 0; y < grid->size.y; y++) {
-            grid->tiles[x][y].value = 0;
-            grid->tiles[x][y].visible = false;
+            Tile* tile = &grid->tiles[x][y];
+            tile->value = 0;
+            tile->visible = false;
+            tile->alreadyMerged = false;
         }
     }
 }
@@ -68,6 +74,8 @@ void GridAddRandomTile(Grid* grid) {
 
     grid->tiles[pos.x][pos.y].visible = true;
     grid->tiles[pos.x][pos.y].value = (rand() % 10) < 9 ? 2 : 4; // 10% chance of 4
+
+    GridUpdateFreeTiles(grid);
 }
 
 bool GridIsFull(Grid grid) {
@@ -84,14 +92,32 @@ bool GridIsFull(Grid grid) {
 
 void GridMove(Grid* grid, GridDirection direction) {
 
+    // reset merge flags
     for (int x = 0; x < grid->size.x; x++) {
         for (int y = 0; y < grid->size.y; y++) {
+            grid->tiles[x][y].alreadyMerged = false;
+        }
+    }
+
+    Vector2i from = {0};
+    Vector2i to = grid->size;
+    int iter = 1;
+
+    // reverse direction
+    if (direction == GRID_DOWN || direction == GRID_RIGHT) {
+        from = (Vector2i) {grid->size.x - 1, grid->size.y - 1};
+        to = (Vector2i) {-1, -1};
+        iter = -1;
+    }
+
+    for (int x = from.x; x != to.x; x += iter) {
+        for (int y = from.y; y != to.y; y += iter) {
 
             Tile* curTile = &grid->tiles[x][y];
             if (!curTile->visible)
                 continue;
 
-            Vector2i curPos = (Vector2i) {x, y};
+            Vector2i curPos = {x, y};
 
             while (1) {
                 Vector2i nextPos = GridTileAdjacentTo(*grid, curPos, direction);
@@ -100,19 +126,23 @@ void GridMove(Grid* grid, GridDirection direction) {
 
                 Tile* nextTile = &grid->tiles[nextPos.x][nextPos.y];
 
-                if (nextTile->visible && nextTile->value == curTile->value) {
+                if (nextTile->visible && nextTile->value == curTile->value &&
+                    !nextTile->alreadyMerged && !curTile->alreadyMerged) {
 
                     GridStepTile(grid, curPos, direction);
                     curPos = nextPos;
+                    curTile = nextTile;
                     nextTile->value *= 2;
+                    nextTile->alreadyMerged = true;
                     continue;
 
-                } else if (nextTile->visible) {
+                } else if (nextTile->visible) { // blocked
                     break;
                 }
 
                 GridStepTile(grid, curPos, direction);
                 curPos = nextPos;
+                curTile = nextTile;
             }
         }
     }
@@ -132,6 +162,7 @@ void GridStepTile(Grid* grid, Vector2i pos, GridDirection direction) {
 
     srcTile->visible = false;
     srcTile->value = 0;
+    srcTile->alreadyMerged = false;
 
     GridUpdateFreeTiles(grid);
 }
@@ -145,8 +176,7 @@ void GridUpdateFreeTiles(Grid* grid) {
 
             if (!grid->tiles[x][y].visible) {
                 int freeIndex = GridPosToIndex(*grid, (Vector2i) {x, y});
-                grid->freeTiles[grid->nFreeTiles] = freeIndex;
-                grid->nFreeTiles++;
+                grid->freeTiles[grid->nFreeTiles++] = freeIndex;
             }
         }
     }

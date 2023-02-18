@@ -1,10 +1,12 @@
 #include "grid.h"
+#include "raylib.h"
 #include <inttypes.h>
 #include <stdio.h>
 
-void EvDrawTile(Tile* tile, Vector2i tileSize) {
+void EvDrawTile(Tile* tile, Vector2i tileSize, Color tileColor) {
 
-    DrawRectangle(tile->screenPos.x, tile->screenPos.y, tileSize.x, tileSize.y, BEIGE);
+    DrawRectangle(tile->screenPos.x, tile->screenPos.y, tileSize.x, tileSize.y,
+                  tileColor);
 
     snprintf(tile->text, TILE_MAX_DIGITS, "%" PRIuMAX, tile->value);
     Vector2i textPos = {tile->screenPos.x + tileSize.x / 2,
@@ -39,6 +41,13 @@ GridDirection EvGetDirection(KeyboardKey key) {
     }
 }
 
+void EvResetGrid(Grid* grid) {
+
+    GridReset(grid);
+    GridAddRandomTile(grid);
+    GridAddRandomTile(grid);
+}
+
 int main(void) {
 
     const int screenWidth = 1000;
@@ -52,10 +61,7 @@ int main(void) {
     int spacing = 10;
 
     Grid grid = GridCreate(gridSize, tileSize, spacing);
-
-    // add 2 initial tiles
-    GridAddRandomTile(&grid);
-    GridAddRandomTile(&grid);
+    EvResetGrid(&grid);
 
     while (!WindowShouldClose()) {
 
@@ -73,7 +79,7 @@ int main(void) {
         switch (key) {
 
             case KEY_R: {
-                GridReset(&grid);
+                EvResetGrid(&grid);
             } break;
 
             case KEY_RIGHT:
@@ -94,7 +100,7 @@ int main(void) {
         Vector2i halfTile = {grid.tileSize.x / 2, grid.tileSize.y / 2};
 
         // fill the background
-        DrawRectangle(origin.x, origin.y, size.x, size.y, BROWN);
+        DrawRectangle(origin.x, origin.y, size.x, size.y, LIGHTGRAY);
 
         for (int x = 0; x < grid.size.x; x++) {
 
@@ -107,7 +113,7 @@ int main(void) {
                 Tile* tile = &grid.tiles[x][y];
 
                 if (tile->visible) {
-                    EvDrawTile(tile, grid.tileSize);
+                    EvDrawTile(tile, grid.tileSize, BEIGE);
                 }
 
                 if (x == 0) {

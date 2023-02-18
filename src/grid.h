@@ -17,6 +17,7 @@ typedef struct {
 typedef struct {
     uintmax_t value;
     bool visible;
+    bool alreadyMerged; // avoid merging the same tile twice in a single move
     Vector2i screenPos;
     char text[TILE_MAX_DIGITS];
 } Tile;
