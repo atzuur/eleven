@@ -1,5 +1,4 @@
 #include "grid.h"
-#include "raylib.h"
 #include <inttypes.h>
 #include <stdio.h>
 

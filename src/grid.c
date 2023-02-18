@@ -1,6 +1,4 @@
 #include "grid.h"
-#include <assert.h>
-#include <stdio.h>
 
 Grid GridCreate(Vector2i size, Vector2i tileSize, int spacing) {
 
