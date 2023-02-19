@@ -23,12 +23,13 @@ typedef struct {
 } Tile;
 
 typedef struct {
-    Vector2i size;
-    Vector2i tileSize;
-    int spacing;
+    Vector2i size; // number of tiles in each dimension
+    Vector2i tileSize; // size of each tile in pixels
+    int spacing; // spacing between tiles in pixels
     Tile** tiles;
     int* freeTiles; // array of indices of free tiles
     int nFreeTiles;
+    uintmax_t score;
 } Grid;
 
 typedef enum {

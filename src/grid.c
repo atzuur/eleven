@@ -11,7 +11,7 @@ Grid GridCreate(Vector2i size, Vector2i tileSize, int spacing) {
 
     grid.tiles = malloc(sizeof(Tile*) * grid.size.x);
     for (int x = 0; x < grid.size.x; x++) {
-        grid.tiles[x] = malloc(sizeof(Tile) * grid.size.y);
+        grid.tiles[x] = calloc(sizeof(Tile), grid.size.y);
     }
 
     int gridSize = GridSize(grid);
@@ -29,9 +29,6 @@ Grid GridCreate(Vector2i size, Vector2i tileSize, int spacing) {
         for (int y = 0; y < grid.size.y; y++) {
 
             Tile* tile = &grid.tiles[x][y];
-
-            tile->value = 0;
-            tile->visible = false;
 
             Vector2i stride = GridStridePixels(grid, (Vector2i) {x, y});
             tile->screenPos.x = gridOrigin.x + stride.x;
@@ -131,6 +128,7 @@ void GridMove(Grid* grid, GridDirection direction) {
                     curPos = nextPos;
                     curTile = nextTile;
                     nextTile->value *= 2;
+                    grid->score += nextTile->value;
                     nextTile->alreadyMerged = true;
                     continue;
 

@@ -2,6 +2,15 @@
 #include <inttypes.h>
 #include <stdio.h>
 
+const int tileFontSize = 20;
+const int uiFontSize = 30;
+
+const int screenWidth = 800;
+const int screenHeight = 800;
+
+const Vector2i tileSize = {100, 100};
+const int tileSpacing = 10;
+
 void EvDrawTile(Tile* tile, Vector2i tileSize, Color tileColor) {
 
     DrawRectangle(tile->screenPos.x, tile->screenPos.y, tileSize.x, tileSize.y,
@@ -11,7 +20,7 @@ void EvDrawTile(Tile* tile, Vector2i tileSize, Color tileColor) {
     Vector2i textPos = {tile->screenPos.x + tileSize.x / 2,
                         tile->screenPos.y + tileSize.y / 2};
 
-    DrawText(tile->text, textPos.x, textPos.y, 20, BLACK);
+    DrawText(tile->text, textPos.x, textPos.y, tileFontSize, BLACK);
 }
 
 GridDirection EvGetDirection(KeyboardKey key) {
@@ -49,17 +58,12 @@ void EvResetGrid(Grid* grid) {
 
 int main(void) {
 
-    const int screenWidth = 1000;
-    const int screenHeight = 600;
-
     InitWindow(screenWidth, screenHeight, "eleven");
     SetTargetFPS(60);
 
-    Vector2i gridSize = {4, 4};
-    Vector2i tileSize = {100, 100};
-    int spacing = 10;
+    const Vector2i gridSize = {4, 4};
 
-    Grid grid = GridCreate(gridSize, tileSize, spacing);
+    Grid grid = GridCreate(gridSize, tileSize, tileSpacing);
     EvResetGrid(&grid);
 
     while (!WindowShouldClose()) {
@@ -90,35 +94,29 @@ int main(void) {
             } break;
         }
 
-        BeginDrawing();
+        const Vector2i origin = GridOrigin(grid);
+        const Vector2i size = GridSizePixels(grid);
 
+        BeginDrawing();
         ClearBackground(RAYWHITE);
 
-        Vector2i origin = GridOrigin(grid);
-        Vector2i size = GridSizePixels(grid);
-        Vector2i halfTile = {grid.tileSize.x / 2, grid.tileSize.y / 2};
+        const char* scoreText = TextFormat("Score: %" PRIuMAX, grid.score);
+        int scoreTextWidth = MeasureText(scoreText, 30);
+        Vector2i corner = {screenWidth - 10 - scoreTextWidth, 10};
+
+        DrawText(TextFormat("Score: %" PRIuMAX, grid.score), corner.x, corner.y, 30,
+                 DARKGRAY);
 
         // fill the background
         DrawRectangle(origin.x, origin.y, size.x, size.y, LIGHTGRAY);
 
         for (int x = 0; x < grid.size.x; x++) {
-
-            Vector2i xPos = GridPosToPixels(grid, (Vector2i) {x, 0});
-            DrawText(TextFormat("%d", x), xPos.x + halfTile.x, xPos.y - halfTile.y, 20,
-                     BLACK);
-
             for (int y = 0; y < grid.size.y; y++) {
 
                 Tile* tile = &grid.tiles[x][y];
 
                 if (tile->visible) {
                     EvDrawTile(tile, grid.tileSize, BEIGE);
-                }
-
-                if (x == 0) {
-                    Vector2i yPos = GridPosToPixels(grid, (Vector2i) {0, y});
-                    DrawText(TextFormat("%d", y), yPos.x - halfTile.x,
-                             yPos.y + halfTile.y, 20, BLACK);
                 }
             }
         }
