@@ -1,7 +1,5 @@
 #include <raylib.h>
 #include <stdint.h>
-#include <stdlib.h>
-#include <time.h>
 
 typedef struct {
     int x;
@@ -33,10 +31,10 @@ typedef struct {
 } Grid;
 
 typedef enum {
-    GRID_UP,
-    GRID_DOWN,
-    GRID_LEFT,
     GRID_RIGHT,
+    GRID_LEFT,
+    GRID_DOWN,
+    GRID_UP,
 } GridDirection;
 
 // get the number of tiles in the grid

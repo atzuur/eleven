@@ -1,4 +1,6 @@
 #include "grid.h"
+#include <stdlib.h>
+#include <time.h>
 
 Grid GridCreate(Vector2i size, Vector2i tileSize, int spacing) {
 
@@ -55,11 +57,14 @@ void GridReset(Grid* grid) {
     for (int x = 0; x < grid->size.x; x++) {
         for (int y = 0; y < grid->size.y; y++) {
             Tile* tile = &grid->tiles[x][y];
-            tile->value = 0;
             tile->visible = false;
+            tile->value = 0;
             tile->alreadyMerged = false;
         }
     }
+
+    grid->score = 0;
+    GridUpdateFreeTiles(grid);
 }
 
 void GridAddRandomTile(Grid* grid) {
@@ -127,9 +132,11 @@ void GridMove(Grid* grid, GridDirection direction) {
                     GridStepTile(grid, curPos, direction);
                     curPos = nextPos;
                     curTile = nextTile;
+
                     nextTile->value *= 2;
                     grid->score += nextTile->value;
                     nextTile->alreadyMerged = true;
+
                     continue;
 
                 } else if (nextTile->visible) { // blocked

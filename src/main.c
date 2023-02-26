@@ -1,12 +1,12 @@
 #include "grid.h"
+#include "raylib.h"
 #include <inttypes.h>
 #include <stdio.h>
 
 const int tileFontSize = 20;
 const int uiFontSize = 30;
 
-const int screenWidth = 800;
-const int screenHeight = 800;
+const Vector2i screenSize = {800, 600};
 
 const Vector2i tileSize = {100, 100};
 const int tileSpacing = 10;
@@ -23,30 +23,19 @@ void EvDrawTile(Tile* tile, Vector2i tileSize, Color tileColor) {
     DrawText(tile->text, textPos.x, textPos.y, tileFontSize, BLACK);
 }
 
-GridDirection EvGetDirection(KeyboardKey key) {
+void EvDrawEndScreen(void) {
 
-    switch (key) {
+    char* gameOverText = "Game Over!";
+    int fontSize = 84;
 
-        case KEY_UP: {
-            return GRID_UP;
-        } break;
+    int spacing = fontSize / 10; // font size / default font size (10)
+    Vector2 textSize =
+        MeasureTextEx(GetFontDefault(), gameOverText, fontSize, (float)spacing);
 
-        case KEY_DOWN: {
-            return GRID_DOWN;
-        } break;
+    Vector2i textPos = {GetScreenWidth() / 2 - (int)textSize.x / 2,
+                        GetScreenHeight() / 2 - (int)textSize.y / 2};
 
-        case KEY_LEFT: {
-            return GRID_LEFT;
-        } break;
-
-        case KEY_RIGHT: {
-            return GRID_RIGHT;
-        } break;
-
-        default: {
-            return -1;
-        } break;
-    }
+    DrawText(gameOverText, textPos.x, textPos.y, fontSize, DARKGRAY);
 }
 
 void EvResetGrid(Grid* grid) {
@@ -56,9 +45,13 @@ void EvResetGrid(Grid* grid) {
     GridAddRandomTile(grid);
 }
 
+GridDirection EvKeyToDirection(KeyboardKey key) {
+    return key - KEY_RIGHT;
+}
+
 int main(void) {
 
-    InitWindow(screenWidth, screenHeight, "eleven");
+    InitWindow(screenSize.x, screenSize.y, "eleven");
     SetTargetFPS(60);
 
     const Vector2i gridSize = {4, 4};
@@ -68,14 +61,17 @@ int main(void) {
 
     while (!WindowShouldClose()) {
 
-        if (IsKeyPressed(KEY_ESCAPE)) {
-            break;
-        }
+        BeginDrawing();
 
         if (GridIsFull(grid)) {
-            DrawText("Game Over!", GetScreenWidth() / 2, GetScreenWidth() / 2, 72,
-                     DARKGRAY);
-            break;
+
+            EvDrawEndScreen();
+            EndDrawing();
+
+            WaitTime(2.0);
+
+            EvResetGrid(&grid);
+            continue;
         }
 
         int key = GetKeyPressed();
@@ -89,25 +85,24 @@ int main(void) {
             case KEY_LEFT:
             case KEY_UP:
             case KEY_DOWN: {
-                GridMove(&grid, EvGetDirection(key));
+                GridMove(&grid, EvKeyToDirection(key));
                 GridAddRandomTile(&grid);
             } break;
         }
 
-        const Vector2i origin = GridOrigin(grid);
-        const Vector2i size = GridSizePixels(grid);
+        Vector2i origin = GridOrigin(grid);
+        Vector2i size = GridSizePixels(grid);
 
-        BeginDrawing();
         ClearBackground(RAYWHITE);
 
         const char* scoreText = TextFormat("Score: %" PRIuMAX, grid.score);
-        int scoreTextWidth = MeasureText(scoreText, 30);
-        Vector2i corner = {screenWidth - 10 - scoreTextWidth, 10};
+        int scoreTextWidth = MeasureText(scoreText, uiFontSize);
+        Vector2i corner = {screenSize.x - 10 - scoreTextWidth, 10};
 
-        DrawText(TextFormat("Score: %" PRIuMAX, grid.score), corner.x, corner.y, 30,
-                 DARKGRAY);
+        DrawText(TextFormat("Score: %" PRIuMAX, grid.score), corner.x, corner.y,
+                 uiFontSize, DARKGRAY);
 
-        // fill the background
+        // fill in gaps between tiles
         DrawRectangle(origin.x, origin.y, size.x, size.y, LIGHTGRAY);
 
         for (int x = 0; x < grid.size.x; x++) {
