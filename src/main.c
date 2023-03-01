@@ -1,5 +1,4 @@
 #include "grid.h"
-#include "raylib.h"
 #include <inttypes.h>
 #include <stdio.h>
 
@@ -61,19 +60,6 @@ int main(void) {
 
     while (!WindowShouldClose()) {
 
-        BeginDrawing();
-
-        if (GridIsFull(grid)) {
-
-            EvDrawEndScreen();
-            EndDrawing();
-
-            WaitTime(2.0);
-
-            EvResetGrid(&grid);
-            continue;
-        }
-
         int key = GetKeyPressed();
         switch (key) {
 
@@ -89,6 +75,9 @@ int main(void) {
                 GridAddRandomTile(&grid);
             } break;
         }
+
+    drawframe:
+        BeginDrawing();
 
         Vector2i origin = GridOrigin(grid);
         Vector2i size = GridSizePixels(grid);
@@ -113,6 +102,17 @@ int main(void) {
                 if (tile->visible) {
                     EvDrawTile(tile, grid.tileSize, BEIGE);
                 }
+            }
+        }
+
+        if (GridIsFull(grid)) {
+
+            EvDrawEndScreen();
+            if (GetTime() - grid.lastMoveTime >= 2.0) {
+                EvResetGrid(&grid);
+            } else {
+                EndDrawing();
+                goto drawframe;
             }
         }
 

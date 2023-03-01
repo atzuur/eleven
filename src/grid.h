@@ -28,6 +28,7 @@ typedef struct {
     int* freeTiles; // array of indices of free tiles
     int nFreeTiles;
     uintmax_t score;
+    double lastMoveTime;
 } Grid;
 
 typedef enum {

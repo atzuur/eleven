@@ -1,7 +1,7 @@
 CC := gcc
 CFLAGS_COMMON := -Wall -Wextra -pedantic -std=c99 -Iraylib/src
-CFLAGS_DEBUG := -g3 -Og -D DEBUG
-CFLAGS_RELEASE := -O3
+CFLAGS_DEBUG := -g3 -Og -DDEBUG
+CFLAGS_RELEASE := -O3 -DNDEBUG
 LDLIBS := -lopengl32 -lgdi32 -lwinmm -lkernel32
 
 RAYLIB_BIN := raylib/src/libraylib.a

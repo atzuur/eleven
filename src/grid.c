@@ -149,6 +149,8 @@ void GridMove(Grid* grid, GridDirection direction) {
             }
         }
     }
+
+    grid->lastMoveTime = GetTime();
 }
 
 void GridStepTile(Grid* grid, Vector2i pos, GridDirection direction) {
