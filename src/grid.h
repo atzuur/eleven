@@ -8,6 +8,9 @@ typedef struct {
     int y;
 } Vector2i;
 
+#define MIN(a, b) ((a) < (b) ? (a) : (b))
+#define MAX(a, b) ((a) > (b) ? (a) : (b))
+
 #define STR(...) #__VA_ARGS__
 #define XSTR(...) STR(__VA_ARGS__)
 
@@ -46,6 +49,9 @@ int GridSize(Grid grid);
 // get the size of the grid in pixels
 Vector2i GridSizePixels(Grid grid);
 
+// scale tilesize to fit the grid in the given dimensions
+Vector2i GridScaleTiles(Grid grid);
+
 // get the origin of the grid in pixels
 Vector2i GridOrigin(Grid grid);
 
@@ -68,7 +74,7 @@ Vector2i GridTileAdjacentTo(Grid grid, Vector2i pos, GridDirection direction);
 // `dims`: the number of tiles in each dimension
 // `tileSize`: the size of each tile in pixels
 // `spacing`: the spacing between tiles in pixels
-Grid GridCreate(Vector2i dims, Vector2i tileSize, int spacing);
+Grid GridCreate(Vector2i dims, Vector2i tileSize);
 
 // free all memory allocated for the grid
 void GridDestroy(Grid* grid);

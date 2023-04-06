@@ -2,14 +2,16 @@
 #include <stdlib.h>
 #include <time.h>
 
-Grid GridCreate(Vector2i size, Vector2i tileSize, int spacing) {
+Grid GridCreate(Vector2i size, Vector2i tileSize) {
 
     srand(time(0)); // for `GridAddRandomTile`
 
     Grid grid = {0};
     grid.size = size;
     grid.tileSize = tileSize;
-    grid.spacing = spacing;
+
+    int max_spacing = MIN(tileSize.x, tileSize.y) / 10;
+    grid.spacing = MAX(max_spacing, 2);
 
     grid.tiles = malloc(sizeof(Tile*) * grid.size.x);
     for (int x = 0; x < grid.size.x; x++) {

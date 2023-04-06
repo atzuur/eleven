@@ -2,9 +2,7 @@
 #include "ui.h"
 
 const Vector2i screenSize = {800, 600};
-
 const Vector2i tileSize = {100, 100};
-const int tileSpacing = 10;
 
 static inline void EvResetGrid(Grid* grid) {
 
@@ -24,7 +22,7 @@ int main(void) {
 
     const Vector2i gridSize = {4, 4};
 
-    Grid grid = GridCreate(gridSize, tileSize, tileSpacing);
+    Grid grid = GridCreate(gridSize, tileSize);
     EvResetGrid(&grid);
 
     while (!WindowShouldClose()) {
