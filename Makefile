@@ -17,7 +17,7 @@ debug: $(RAYLIB_BIN)
 
 $(RAYLIB_BIN):
 ifeq (,$(wildcard $(RAYLIB_BIN))) # if raylib is not built yet
-	$(MAKE) -C raylib/src CUSTOM_CFLAGS="-Wno-unused-function" -j6
+	$(MAKE) -C raylib/src CUSTOM_CFLAGS="-w" -j4
 endif
 
 clean:
