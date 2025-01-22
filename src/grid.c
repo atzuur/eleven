@@ -15,7 +15,7 @@ Grid GridCreate(Vector2i size, Vector2i tileSize) {
 
     grid.tiles = malloc(sizeof(Tile*) * grid.size.x);
     for (int x = 0; x < grid.size.x; x++) {
-        grid.tiles[x] = calloc(sizeof(Tile), grid.size.y);
+        grid.tiles[x] = calloc(grid.size.y, sizeof(Tile));
     }
 
     int gridSize = GridSize(grid);
